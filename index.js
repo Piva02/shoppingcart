@@ -9,11 +9,16 @@ const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
 const userRoutes = require('./routes/users');
 const orderRoutes = require('./routes/orders');
+const estadoRoutes = require('./routes/estados');
+const cartRoutes = require('./routes/cart');
 
+app.use('/api/estados', estadoRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/cart', cartRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -28,3 +33,4 @@ app.get('/api/products', (req, res) => {
 app.post('/api/products', (req, res) => {
     res.send('Product created');
 });
+

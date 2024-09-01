@@ -1,26 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controladores/usersController');
-const { verifyToken } = require('../middleware/auth');
 
-// Create a user
-router.post('/', usersController.createUser);
+// Ruta para iniciar sesión
+router.post('/login', usersController.loginUser);
 
-// Get all users
-router.get('/', usersController.getUsers);
-
-// Get a user by ID
-router.get('/:id', usersController.getUserById);
-
-// Update a user
-router.put('/:id', usersController.updateUser);
-
-// Delete a user
-router.delete('/:id', usersController.deleteUser);
-
-//Token during user registration
-
+// Ruta para registrar un nuevo usuario
 router.post('/register', usersController.createUser);
 
+// Ruta para confirmar el token
+router.post('/confirm', usersController.confirmUser);
+
+
+// Otras rutas como actualizar, eliminar, etc.
 module.exports = router;
 

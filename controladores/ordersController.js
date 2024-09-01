@@ -1,19 +1,29 @@
-const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 exports.createOrder = async (req, res) => {
     try {
-        const { id_usuario, total } = req.body;
+        const { id_usuario, estado, detalles } = req.body;
 
-        await sequelize.query('EXEC sp_ConfirmarPedido @id_usuario=:id_usuario, @total=:total', {
-            replacements: { id_usuario, total },
-        });
+        const detallesXml = `<detalles>${detalles.map(detalle => `
+            <detalle>
+                <id_producto>${detalle.id_producto}</id_producto>
+                <cantidad>${detalle.cantidad}</cantidad>
+                <precio>${detalle.precio}</precio>
+            </detalle>`).join('')}</detalles>`;
 
-        res.status(201).json({ message: 'Pedido confirmado existosamente' });
+        await sequelize.query(
+            'EXEC sp_InsertarOrden @id_usuario=:id_usuario, @estado=:estado, @detalles=:detallesXml',
+            {
+                replacements: { id_usuario, estado, detallesXml },
+            }
+        );
+
+        res.status(201).json({ message: 'Orden creada exitosamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 exports.getOrders = async (req, res) => {
     try {
         const orders = await sequelize.query('SELECT * FROM pedidos', { type: sequelize.QueryTypes.SELECT });
@@ -22,6 +32,35 @@ exports.getOrders = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.confirmCart = async (req, res) => {
+    try {
+        const { id_cart } = req.body;
+
+        await sequelize.query('EXEC sp_ConfirmarPedido @id_cart=:id_cart', {
+            replacements: { id_cart },
+        });
+
+        res.status(200).json({ message: 'Carrito confirmado exitosamente.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.rejectCart = async (req, res) => {
+    try {
+        const { id_cart } = req.body;
+
+        await sequelize.query('DELETE FROM cart_detail WHERE id_cart = :id_cart', {
+            replacements: { id_cart },
+        });
+
+        res.status(200).json({ message: 'Carrito rechazado y limpiado exitosamente.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 exports.getOrderById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -57,6 +96,7 @@ exports.updateOrder = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 exports.deleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
@@ -70,4 +110,6 @@ exports.deleteOrder = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
 

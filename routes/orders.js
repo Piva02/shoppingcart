@@ -2,20 +2,28 @@ const express = require('express');
 const router = express.Router();
 const ordersController = require('../controladores/ordersController');
 
-// Create an order
+// Ruta para crear una orden
 router.post('/', ordersController.createOrder);
 
-// Get all orders
+// Ruta para confirmar el carrito
+router.post('/confirm', ordersController.confirmCart);
+
+// Ruta para rechazar el carrito
+router.post('/reject', ordersController.rejectCart);
+
+// Ruta para obtener todas las órdenes
 router.get('/', ordersController.getOrders);
 
-// Get an order by ID
+// Ruta para obtener una orden por ID
 router.get('/:id', ordersController.getOrderById);
 
-// Update an order
+// Ruta para actualizar una orden
 router.put('/:id', ordersController.updateOrder);
 
-// Delete an order
+// Ruta para eliminar una orden
 router.delete('/:id', ordersController.deleteOrder);
 
 module.exports = router;
+
+
 

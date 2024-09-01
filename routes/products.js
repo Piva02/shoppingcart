@@ -1,22 +1,19 @@
-const { verifyToken } = require('../middleware/auth');
+const { verifyAdmin, verifyToken } = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 const productsController = require('../controladores/productsController');
 
-// Create a product
-router.post('/', productsController.createProduct);
+// Crear un producto (Solo administradores)
+router.post('/', verifyToken, verifyAdmin, productsController.createProduct);
 
-// Get all products
+// Obtener todos los productos (Cualquier usuario o no)
 router.get('/', productsController.getProducts);
 
-// Get a product by ID
-router.get('/:id', productsController.getProductById);
+// Actualizar un producto (Solo administradores)
+router.put('/:id', verifyToken, verifyAdmin, productsController.updateProduct);
 
-// Update a product
-router.put('/:id', productsController.updateProduct);
-
-// Delete a product
-router.delete('/:id', productsController.deleteProduct);
+// Eliminar un producto (Solo administradores)
+router.delete('/:id', verifyToken, verifyAdmin, productsController.deleteProduct);
 
 module.exports = router;
 

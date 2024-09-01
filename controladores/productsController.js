@@ -16,7 +16,7 @@ exports.createProduct = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
+// Para busqueda del listado de productos
 exports.getProducts = async (req, res) => {
     try {
         const products = await sequelize.query('SELECT * FROM Productos', { type: sequelize.QueryTypes.SELECT });
@@ -25,7 +25,7 @@ exports.getProducts = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
+// Para busqueda de producto especifico
 exports.getProductById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -76,4 +76,33 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
+exports.updateProductStock = async (req, res) => {
+    try {
+        const { id_producto, cantidad } = req.body;
+
+        // Reducir el stock del producto
+        const product = await sequelize.query(
+            'UPDATE Productos SET stock = stock - :cantidad WHERE id_producto = :id_producto AND stock >= :cantidad',
+            {
+                replacements: { id_producto, cantidad },
+            }
+        );
+
+        if (product[0].affectedRows === 0) {
+            return res.status(400).json({ message: 'No hay suficiente stock para este producto.' });
+        }
+
+        // Verificar si el stock llegó a 0 y actualizar el estado a 'inactivo'
+        await sequelize.query(
+            'UPDATE Productos SET estado = \'inactivo\' WHERE id_producto = :id_producto AND stock = 0',
+            {
+                replacements: { id_producto },
+            }
+        );
+
+        res.status(200).json({ message: 'Stock actualizado correctamente.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
